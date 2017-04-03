@@ -39,14 +39,17 @@ function b64_creation(img_data){
     // print("-----------------");
     // print(" ");
     // 
-    
-              
+
     $.ajax({
         type: "POST",
         url: "http://10.202.217.19:3000/img_sent/",
         data: "Hello World post",
         success: function(msg){
-             alert('wow '+ msg);
+             if(msg == "ok saved"){
+                print("msg");
+             }else{
+                print("didn't get the msg");
+             }
            },
         dataType: String
     });
