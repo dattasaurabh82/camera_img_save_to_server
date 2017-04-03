@@ -39,20 +39,6 @@ function b64_creation(img_data){
     // print("-----------------");
     // print(" ");
     // 
-
-    $.ajax({
-        type: "POST",
-        url: "http://10.202.217.19:3000/img_sent/",
-        data: "Hello World post",
-        success: function(msg){
-             if(msg == "ok saved"){
-                print("msg");
-             }else{
-                print("didn't get the msg");
-             }
-           },
-        dataType: String
-    });
 }
 
 function save_frames_server(data){
@@ -67,8 +53,23 @@ var Controls = function() {
     this.Image_count = 4;
 
     this.Save_images = function() {
-        saveFrames("frames", "png", this.Image_count, 1, function(data){
-            save_frames_server(data);
+        // saveFrames("frames", "png", this.Image_count, 1, function(data){
+        //     save_frames_server(data);
+        // });
+        // 
+        var dataa = {};
+        dataa.title = "Hello World post";
+        $.ajax({
+            type: "POST",
+            url: "http://10.202.217.19:3000/img_sent/",
+            data: dataa,
+            success: function(msg){
+                if(msg == "ok saved"){
+                    print(msg);
+                }else{
+                    print("didn't get the msg");
+                }
+            }
         });
-    };
+        };
 };

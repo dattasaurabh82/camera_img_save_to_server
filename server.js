@@ -7,10 +7,10 @@ var server = app.listen(port);
 
 app.use(express.static('public'));
 
-app.get('/img_sent/', function(req, res) {
+app.post('/img_sent/', function(req, res) {
   // it is supposed to read "Hello World post" here
-  console.log(req.body);
   console.log("received something");
+  console.log(req.body);
   res.send('ok saved');
 });
 
