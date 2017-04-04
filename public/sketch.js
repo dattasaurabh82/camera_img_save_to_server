@@ -2,9 +2,7 @@ var capture;
 
 var cp;
 var gui;
-var counter = 0;
-var saved = false;
-var number_of_images = 0;
+
 
 function setup() {
     createCanvas(640, 480);
@@ -13,9 +11,9 @@ function setup() {
     capture.size(640, 480);
     capture.hide();
 
+    //---------- GUI SETUP ---------//
     cp = new Controls();
     gui = new dat.GUI();
-
     initGUI();
 }
 
@@ -32,9 +30,16 @@ var initGUI = function() {
 };
 
 var Controls = function() {
+    // Default starting images we want to save
     this.Image_count = 4;
 
     this.Save_images = function() {
+        //---------------------------------------------------------------------------
+        // saveFrames("filename", "ext", <number of images>, duration, callback(){});
+        // --------------------------------------------------------------------------
+        // The callback function, if used, doesn't save the files locally but
+        // throws an array of image objects with the data like file name, ext 
+        // and bs64 string
         saveFrames("frames", "jpg", this.Image_count, 1, function(data){
             save_frames_server(data);
         });
@@ -59,25 +64,24 @@ function save_frames_server(data){
 
 function b64_creation(img_data){
     // print(img_data);
-
+    // 
+    // ------------ CLEAN IMAGE DATA --------------//
+    // Get the imagedata of bs64 string 
     var raw_bs6_data = img_data.imageData;
-    // print(raw_bs6_data);
-    // var sliced_bs6_data = raw_bs6_data.slice(24, raw_bs6_data.length);
+    // Remove the headers from 'data..' till '..base64,'
     var sliced_bs6_data = raw_bs6_data.replace(/^data:image\/octet-stream;base64,/,'');
-    // print(sliced_bs6_data);
-
+    //put it back in the image object. 
     img_data.imageData = sliced_bs6_data;
 
-    // var raw_image_data = img_data.imageData.splice(24, img_data.imageData.length);
-    // img_data.imageData = raw_image_data;
-
+    //------------ SEND THE IMAGE DATA ------------//
     $.ajax({
         type: "POST",
-        url: "/img_sent/",
+        url: "/img_sent/", // particular endpoint
         data: img_data,
         success: function(msg){
             if(msg == "ok saved"){
                 print(msg);
+                window.alert("saved");
             }else{
                 print("didn't get the msg");
                 window.alert("didn't get the msg");
