@@ -21,8 +21,8 @@ app.post('/img_sent/', function(req, res) {
   console.log(img_object.imageData);
 
   var buff = new Buffer(img_object.imageData, 'base64');
-  fs.writeFileSync('/data/' + img_object.filename + img_object.ext, buff);
-  
+  fs.writeFileSync('data/' + img_object.filename + '.' +img_object.ext, buff);
+
   res.send('ok saved');
 });
 
