@@ -29,12 +29,11 @@ var initGUI = function() {
 
 function b64_creation(img_data){
     print(img_data);
-    
-    var dataa = {data: "Hello World post"};
+
     $.ajax({
         type: "POST",
         url: "/img_sent/",
-        data: img_data,
+        data: '{"data": "TEST"}',
         success: function(msg){
             if(msg == "ok saved"){
                 print(msg);

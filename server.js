@@ -13,7 +13,6 @@ app.use(express.static('public'));
 app.post('/img_sent/', dataParser, function(req, res) {
   // it is supposed to read "Hello World post" here
   console.log("received something");
-  console.log(req.params);
   console.log(req.body);
   res.send('ok saved');
 });
