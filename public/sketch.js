@@ -34,21 +34,7 @@ var initGUI = function() {
 
 var Controls = function() {
     this.Clean_old_data = function(){
-        var flag = {};
-        flag.status = "clean";
-        // print(flag);
-        $.ajax({
-            type: "POST",
-            url: "/clean_data/", // particular endpoint
-            data: flag,
-            success: function(msg){
-                if(msg == "ok cleaned"){
-                    window.alert("Cleaned old data in server.\nYou can save new images");
-                }else{
-                    window.alert("didn't get the msg");
-                }
-            }
-        });
+        cleanData();
     };
 
     // Default starting images we want to save
@@ -68,10 +54,12 @@ var Controls = function() {
 
     this.Train_images = function(){
         // ask server to train data
+        trainImages();
     };
 
     this.Show_future = function(){
-        // ask server to train data
+        // fetch the trained image and show
+        fetchTrainedImage();
     };
 
 };
@@ -105,7 +93,7 @@ function b64_creation(img_data){
                 counter = counter + 1;
                 if(counter >= cp.Image_count){
                     window.alert("Saved " + cp.Image_count + " images in server");
-                    counter = 0;    
+                    counter = 0;
                 }
             }else{
                 print("didn't get the msg");
@@ -120,4 +108,30 @@ function confirmationAlert(img_number){
         window.alert("Saved all images in server");
         counter = 0;
     }
+}
+
+function cleanData(){
+    var flag = {};
+    flag.status = "clean";
+    // print(flag);
+    $.ajax({
+        type: "POST",
+        url: "/clean_data/", // particular endpoint
+        data: flag,
+        success: function(msg){
+            if(msg == "ok cleaned"){
+                window.alert("Cleaned old data in server.\nYou can save new images");
+            }else{
+                window.alert("didn't get the msg");
+            }
+        }
+    });
+}
+
+function trainImages(){
+    //----
+}
+
+function fetchTrainedImage(){
+    //--
 }
