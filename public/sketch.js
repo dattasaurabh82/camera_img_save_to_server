@@ -30,10 +30,14 @@ var initGUI = function() {
 function b64_creation(img_data){
     print(img_data);
 
+    // var dataa = {};
+    // dataa.title = "title";
+    // dataa.message = "message";
+
     $.ajax({
         type: "POST",
         url: "/img_sent/",
-        data: '{"data": "TEST"}',
+        data: img_data,
         success: function(msg){
             if(msg == "ok saved"){
                 print(msg);
@@ -46,9 +50,10 @@ function b64_creation(img_data){
 
 function save_frames_server(data){
     print(data);
-    for (var i = 0; i < data.length; i ++){
-        b64_creation(data[i]);
-    }
+    // for (var i = 0; i < data.length; i ++){
+    //     b64_creation(data[i]);
+    // }
+    b64_creation(data[0]);
 }
 
 
@@ -59,5 +64,6 @@ var Controls = function() {
         saveFrames("frames", "png", this.Image_count, 1, function(data){
             save_frames_server(data);
         });
+
     };
 };
