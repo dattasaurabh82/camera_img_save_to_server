@@ -28,17 +28,21 @@ var initGUI = function() {
 };
 
 function b64_creation(img_data){
-    // print("-----------------");
-    // print(img_data.filename);
-    // print(img_data.ext);
+    print(img_data);
     
-    // extract raw bs64 data
-    // var raw_bs64_data = String(img_data.imageData);
-    // var extracted_bs64_data = raw_bs64_data.replace(/^data\:image\/\w+\;base64\,/, '');
-    // print(extracted_bs64_data);
-    // print("-----------------");
-    // print(" ");
-    // 
+    var dataa = {data: "Hello World post"};
+    $.ajax({
+        type: "POST",
+        url: "/img_sent/",
+        data: img_data,
+        success: function(msg){
+            if(msg == "ok saved"){
+                print(msg);
+            }else{
+                print("didn't get the msg");
+            }
+        }
+    });
 }
 
 function save_frames_server(data){
@@ -53,23 +57,8 @@ var Controls = function() {
     this.Image_count = 4;
 
     this.Save_images = function() {
-        // saveFrames("frames", "png", this.Image_count, 1, function(data){
-        //     save_frames_server(data);
-        // });
-        // 
-        var dataa = {};
-        dataa.title = "Hello World post";
-        $.ajax({
-            type: "POST",
-            url: "http://10.202.217.19:3000/img_sent/",
-            data: dataa,
-            success: function(msg){
-                if(msg == "ok saved"){
-                    print(msg);
-                }else{
-                    print("didn't get the msg");
-                }
-            }
+        saveFrames("frames", "png", this.Image_count, 1, function(data){
+            save_frames_server(data);
         });
-        };
+    };
 };
