@@ -2,7 +2,7 @@ var capture;
 
 var cp;
 var gui;
-
+var counter = 0;
 
 function setup() {
     createCanvas(640, 480);
@@ -20,9 +20,12 @@ function setup() {
 function draw() {
     background(0);
     image(capture, 0, 0);
+
+    // print(cp.Image_count);
 }
 var speeder ;
 var initGUI = function() {
+    gui.add(cp, 'Clean_old_data');
     gui.add(cp, 'Image_count', 1, 10).step(1);
     gui.add(cp, 'Save_images');
     gui.add(cp, 'Train_images');
@@ -30,6 +33,24 @@ var initGUI = function() {
 };
 
 var Controls = function() {
+    this.Clean_old_data = function(){
+        var flag = {};
+        flag.status = "clean";
+        // print(flag);
+        $.ajax({
+            type: "POST",
+            url: "/clean_data/", // particular endpoint
+            data: flag,
+            success: function(msg){
+                if(msg == "ok cleaned"){
+                    window.alert("Cleaned old data in server.\nYou can save new images");
+                }else{
+                    window.alert("didn't get the msg");
+                }
+            }
+        });
+    };
+
     // Default starting images we want to save
     this.Image_count = 4;
 
@@ -81,11 +102,22 @@ function b64_creation(img_data){
         success: function(msg){
             if(msg == "ok saved"){
                 print(msg);
-                window.alert("saved");
+                counter = counter + 1;
+                if(counter >= cp.Image_count){
+                    window.alert("Saved " + cp.Image_count + " images in server");
+                    counter = 0;    
+                }
             }else{
                 print("didn't get the msg");
                 window.alert("didn't get the msg");
             }
         }
     });
+}
+
+function confirmationAlert(img_number){
+    if(counter >= img_number){
+        window.alert("Saved all images in server");
+        counter = 0;
+    }
 }
