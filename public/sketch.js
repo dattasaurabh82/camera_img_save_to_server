@@ -6,7 +6,10 @@ var f1;
 var f2;
 var counter = 0;
 
-var socket = new WebSocket("ws://localhost:8245/serial");
+var socket;
+var ser_server_port = 8245;
+var old_server_port = 0;
+var change_socket;
 
 function setup() {
     createCanvas(640, 480);
@@ -24,16 +27,33 @@ function setup() {
     f2.open();
     initGUI();
 
-    // The socket connection needs two event listeners:
-    socket.onopen = openSocket;
-    socket.onmessage = showData;
+    change_socket = true;
 }
 
 function draw() {
     background(0);
     image(capture, 0, 0);
     // print(cp.Image_count);
+    
+    // websocket setup from serial server
+    ser_server_port = cp.server_port;
+
+    if (change_socket){
+        // The socket connection needs two event listeners:
+        socket = new WebSocket("ws://localhost:" + ser_server_port + "/serial");
+        socket.onopen = openSocket;
+        socket.onmessage = showData;
+
+        change_socket = false;
+    }else{
+        if(ser_server_port != old_server_port){
+            change_socket = true;
+            old_server_port = ser_server_port;
+        }
+    }
 }
+
+
 var speeder ;
 var initGUI = function() {
     f1.add(cp, 'Clean_old_data');
@@ -41,7 +61,11 @@ var initGUI = function() {
     f1.add(cp, 'Save_images');
     f1.add(cp, 'Train_images');
     f1.add(cp, 'Show_future');
+
+    f2.add(cp, 'server_port');
 };
+
+
 
 var Controls = function() {
     this.Clean_old_data = function(){
@@ -72,6 +96,8 @@ var Controls = function() {
         // fetch the trained image and show
         fetchTrainedImage();
     };
+
+    this.server_port = 8245;
 
 };
 
