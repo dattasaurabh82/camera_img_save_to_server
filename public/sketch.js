@@ -2,7 +2,11 @@ var capture;
 
 var cp;
 var gui;
+var f1;
+var f2;
 var counter = 0;
+
+var socket = new WebSocket("ws://localhost:8245/serial");
 
 function setup() {
     createCanvas(640, 480);
@@ -14,22 +18,29 @@ function setup() {
     //---------- GUI SETUP ---------//
     cp = new Controls();
     gui = new dat.GUI();
+    f1 = gui.addFolder('Image Controls');
+    f2 = gui.addFolder('Serial_server_controls');
+    f1.open();
+    f2.open();
     initGUI();
+
+    // The socket connection needs two event listeners:
+    socket.onopen = openSocket;
+    socket.onmessage = showData;
 }
 
 function draw() {
     background(0);
     image(capture, 0, 0);
-
     // print(cp.Image_count);
 }
 var speeder ;
 var initGUI = function() {
-    gui.add(cp, 'Clean_old_data');
-    gui.add(cp, 'Image_count', 1, 10).step(1);
-    gui.add(cp, 'Save_images');
-    gui.add(cp, 'Train_images');
-    gui.add(cp, 'Show_future');
+    f1.add(cp, 'Clean_old_data');
+    f1.add(cp, 'Image_count', 1, 10).step(1);
+    f1.add(cp, 'Save_images');
+    f1.add(cp, 'Train_images');
+    f1.add(cp, 'Show_future');
 };
 
 var Controls = function() {
@@ -135,3 +146,13 @@ function trainImages(){
 function fetchTrainedImage(){
     //--
 }
+
+
+function openSocket() {
+    socket.send("Hello server");
+  }
+ 
+function showData(result) {
+    // when the server returns, show the result in the div:
+    console.log(result.data);
+  }
