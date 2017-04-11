@@ -42,6 +42,8 @@ app.post('/img_sent/', function(req, res) {
       console.log("folder: " + folder_path + " exists");
       console.log("saving the file");
     }
+
+    req_counter = 0;
   }
 
   // get the data write teh buffer to the files in the dedicated folder 
