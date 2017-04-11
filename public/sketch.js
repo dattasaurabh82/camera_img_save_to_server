@@ -83,6 +83,8 @@ var Controls = function() {
         // throws an array of image objects with the data like file name, ext 
         // and bs64 string
         saveFrames("frames", "jpg", this.Image_count, 1, function(data){
+            // data contains file a list of each image object
+            // each image object = {filename, ext, imageData}
             save_frames_server(data);
         });
     };
