@@ -1,18 +1,5 @@
 var domAnimator = new DomAnimator();
-// domAnimator.addFrame('a');
-// domAnimator.addFrame('au');
-// domAnimator.addFrame('auto');
-// domAnimator.addFrame('autom');
-// domAnimator.addFrame('automa');
-// domAnimator.addFrame('automat');
-// domAnimator.addFrame('automato');
-// domAnimator.addFrame('a tomato');
-// domAnimator.addFrame('auto ato');
-// domAnimator.addFrame('au omato');
-// domAnimator.addFrame('aut mato');
-// domAnimator.addFrame('a tom to');
-// domAnimator.addFrame('aut mato');
-// domAnimator.addFrame('automato.farm');
+
 var frame1 = ['     _I_      ',
               '    /o o\\    ',
               '    | - |     ',
