@@ -41,13 +41,36 @@ function switchesTwo(err, state) {
 buttonOne.watch(switchesOne);
 buttonTwo.watch(switchesTwo);
 
+///////////-------------- https server ---------------///////////
+var express = require('express');
+var fs = require('fs');
+var https = require('https');
+
+var app = express();
+
+var privateKey  = fs.readFileSync('sslcert/key.pem', 'utf8');
+var certificate = fs.readFileSync('sslcert/cert.pem', 'utf8');
+
+var credentials = {
+  key: privateKey,
+  cert: certificate
+};
+
+var SERVER_PORT = 8081;
+
+//pass in your express app and credentials to create an https server
+var httpsServer = https.createServer(credentials, app);
+httpsServer.listen(SERVER_PORT);
+
+
+
 ///////////-------------- WEB SOCKET PART ---------------////////////
 
 var WebSocketServer = require('ws').Server;
 
-var SERVER_PORT = 8081;
-
-var wss = new WebSocketServer({port: SERVER_PORT});
+var wss = new WebSocketServer({
+  server: httpsServer
+});
 
 var connections = new Array(10);
 
@@ -76,7 +99,7 @@ function handleConnection(client){
     if (sendData){
       broadcast(msgFromServer);
     }
-    
+
   });
 
   client.on('close', function() {                // when a client closes its connection

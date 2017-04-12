@@ -44,7 +44,7 @@ function draw() {
     wss_ip = cp.server_ip;
 
     if(changePort){
-        socket = new WebSocket("ws://"+ wss_ip +":" + wss_port);
+        socket = new WebSocket("wss://"+ wss_ip +":" + wss_port);
         // The socket connection needs two event listeners
         // set them up here
         socket.onopen = openSocket;
@@ -61,7 +61,7 @@ function draw() {
     if(changeAddress){
         // The socket connection needs two event listeners
         // set them up here again
-        socket = new WebSocket("ws://"+ wss_ip +":" + wss_port);
+        socket = new WebSocket("wss://"+ wss_ip +":" + wss_port);
         socket.onopen = openSocket;
         socket.onmessage = showData;
         socket.onclose = sendClosed;
@@ -124,8 +124,8 @@ var Controls = function() {
         fetchTrainedImage();
     };
 
-    this.server_port = 8080;
-    this.server_ip = "10.202.217.100";
+    this.server_port = 8081;
+    this.server_ip = "10.202.217.102";
 
 };
 
