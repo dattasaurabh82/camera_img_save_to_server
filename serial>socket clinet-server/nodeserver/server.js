@@ -74,7 +74,7 @@ var wss = new WebSocketServer({
 
 var connections = new Array(10);
 
-var msgFromServer = "Connecection confirmed";
+var msgFromServer = "Connection confirmed";
 var sendData = false;
 
 // websocket event listener
