@@ -7,9 +7,12 @@ var f2;
 var counter = 0;
 
 var socket;
-var ser_server_port = 8245;
-var old_server_port = 0;
-var change_socket;
+var wss_port = 8080;
+var old_wss_port = 0;
+var changePort;
+var changeAddress;
+var wss_ip = "10.202.217.100";
+var old_wss_ip = "";
 
 function setup() {
     createCanvas(640, 480);
@@ -21,13 +24,14 @@ function setup() {
     //---------- GUI SETUP ---------//
     cp = new Controls();
     gui = new dat.GUI();
-    f1 = gui.addFolder('Image Controls');
-    f2 = gui.addFolder('Serial_server_controls');
+    f1 = gui.addFolder('GENERAL IMAGE CONTROLS');
+    f2 = gui.addFolder('WS BUTTON CONTROL PARAMS');
     f1.open();
     f2.open();
     initGUI();
 
-    change_socket = true;
+    changePort = true;
+    changeAddress = true;
 }
 
 function draw() {
@@ -35,22 +39,42 @@ function draw() {
     image(capture, 0, 0);
     // print(cp.Image_count);
     
-    // websocket setup from serial server
-    ser_server_port = cp.server_port;
+    // ----------- websocket server setup --------------// 
+    wss_port = cp.server_port;
+    wss_ip = cp.server_ip;
 
-    if (change_socket){
-        // The socket connection needs two event listeners:
-        socket = new WebSocket("ws://localhost:" + ser_server_port + "/serial");
+    if(changePort){
+        socket = new WebSocket("ws://"+ wss_ip +":" + wss_port);
+        // The socket connection needs two event listeners
+        // set them up here
         socket.onopen = openSocket;
         socket.onmessage = showData;
 
-        change_socket = false;
+        changePort = false;
     }else{
-        if(ser_server_port != old_server_port){
-            change_socket = true;
-            old_server_port = ser_server_port;
+        if(wss_port != old_wss_port){
+            changePort = true;
+            old_wss_port = wss_port;
         }
     }
+
+    if(changeAddress){
+        // The socket connection needs two event listeners
+        // set them up here again
+        socket = new WebSocket("ws://"+ wss_ip +":" + wss_port);
+        socket.onopen = openSocket;
+        socket.onmessage = showData;
+        socket.onclose = sendClosed;
+
+        changeAddress = false;
+    }else{
+        if(wss_ip != old_wss_ip){
+            changeAddress = true;
+            old_wss_ip = wss_ip;
+        }
+    }
+
+    //------------------- *********** ------------------//
 }
 
 
@@ -62,6 +86,7 @@ var initGUI = function() {
     f1.add(cp, 'Train_images');
     f1.add(cp, 'Show_future');
 
+    f2.add(cp, 'server_ip');
     f2.add(cp, 'server_port');
 };
 
@@ -99,7 +124,8 @@ var Controls = function() {
         fetchTrainedImage();
     };
 
-    this.server_port = 8245;
+    this.server_port = 8080;
+    this.server_ip = "10.202.217.100";
 
 };
 
@@ -178,9 +204,13 @@ function fetchTrainedImage(){
 
 function openSocket() {
     socket.send("Hello server");
-  }
+}
  
 function showData(result) {
     // when the server returns, show the result in the div:
-    console.log(result.data);
-  }
+    console.log("Server said: " + result.data);
+}
+
+function sendClosed(){
+    console.log("Server closed");
+}
