@@ -1,3 +1,7 @@
+# prototype setup [first build]
+![alt tag](https://raw.githubusercontent.com/dattasaurabh82/camera_img_save_to_server/master/serial%3Esocket%20clinet-server/gpio_test/pictures/IMG_20170413_232524.jpg
+)
+
 # This is running in pi as a https websocket server
 
 ## Before running:`node server.js`
