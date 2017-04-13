@@ -1,45 +1,88 @@
 var GPIO = require('onoff').Gpio,
     buttonOne = new GPIO(17, 'in', 'both');
     buttonTwo = new GPIO(18, 'in', 'both');
+    buttonThree = new GPIO(19, 'in', 'both');
+    buttonFour = new GPIO(20, 'in', 'both');
 
-var buttonStates = ["LOW", "LOW", "LOW", "LOW", "LOW", "LOW"];
+var buttonStates = {
+                      buttonOne: "LOW",
+                      buttonTwo: "LOW",
+                      buttonThree: "LOW",
+                      buttonFour: "LOW"
+                    };
 
-function switchesOne(err, state) {
+function switchOne(err, state) {
   if(err){
      throw err;
   }else{
     if(state == 1) {
       console.log("pressedOne");
-      buttonStates[0] = "HIGH";
+      buttonStates.buttonOne = "HIGH";
       if (sendData) {
         broadcast(buttonStates);
       }
       console.log(buttonStates);
     }else{
-      buttonStates[0] = "LOW";
+      buttonStates.buttonOne = "LOW";
     }
   }
 }
 
-function switchesTwo(err, state) {
+function switchTwo(err, state) {
   if(err){
      throw err;
   }else{
     if(state == 1) {
       console.log("pressedTwo");
-      buttonStates[1] = "HIGH";
+      buttonStates.buttonTwo = "HIGH";
       if (sendData) {
         broadcast(buttonStates);
       }
       console.log(buttonStates);
     }else{
-      buttonStates[1] = "LOW";
+      buttonStates.buttonTwo = "LOW";
     }
   }
 }
 
-buttonOne.watch(switchesOne);
-buttonTwo.watch(switchesTwo);
+function switchThree(err, state) {
+  if(err){
+     throw err;
+  }else{
+    if(state == 1) {
+      console.log("pressedThree");
+      buttonStates.buttonThree = "HIGH";
+      if (sendData) {
+        broadcast(buttonStates);
+      }
+      console.log(buttonStates);
+    }else{
+      buttonStates.buttonThree = "LOW";
+    }
+  }
+}
+
+function switchFour(err, state) {
+  if(err){
+     throw err;
+  }else{
+    if(state == 1) {
+      console.log("pressedFour");
+      buttonStates.buttonFour = "HIGH";
+      if (sendData) {
+        broadcast(buttonStates);
+      }
+      console.log(buttonStates);
+    }else{
+      buttonStates.buttonFour = "LOW";
+    }
+  }
+}
+
+buttonOne.watch(switchOne);
+buttonTwo.watch(switchTwo);
+buttonThree.watch(switchThree);
+buttonFour.watch(switchFour);
 
 ///////////-------------- https server ---------------///////////
 var express = require('express');
@@ -56,12 +99,19 @@ var credentials = {
   cert: certificate
 };
 
-var SERVER_PORT = 8081;
+var SERVER_PORT = process.env.PORT || 8081;
+var HOST = process.env.HOST || '';
 
 //pass in your express app and credentials to create an https server
 var httpsServer = https.createServer(credentials, app);
-httpsServer.listen(SERVER_PORT);
-
+httpsServer.listen(SERVER_PORT, HOST, null, function(){
+  console.log(" ");
+  console.log("----------------------------------");
+  console.log('wss server running on port: %d in %s mode', this.address().port, app.settings.env);
+  console.log("with self signed ssl sertficate");
+  console.log("----------------------------------");
+  console.log(" ");
+});
 
 
 ///////////-------------- WEB SOCKET PART ---------------////////////
@@ -112,7 +162,7 @@ function handleConnection(client){
 
 // This function broadcasts messages to all webSocket clients
 function broadcast(data) {
- for (var c in connections) {             // iterate over the array of connections
-    connections[c].send(JSON.stringify(data));          // send the data to each connection
+ for (var c in connections) {                     // iterate over the array of connections
+    connections[c].send(JSON.stringify(data)); // send the data to each connection
   }
 }

@@ -8,11 +8,11 @@ var counter = 0;
 
 var socket;
 var wss_port = 8080;
-var old_wss_port = 0;
+var old_wss_port = 8080;
 var changePort;
 var changeAddress;
 var wss_ip = "10.202.217.100";
-var old_wss_ip = "";
+var old_wss_ip = "10.202.217.100";
 
 function setup() {
     createCanvas(640, 480);
@@ -44,12 +44,7 @@ function draw() {
     wss_ip = cp.server_ip;
 
     if(changePort){
-        socket = new WebSocket("wss://"+ wss_ip +":" + wss_port);
-        // The socket connection needs two event listeners
-        // set them up here
-        socket.onopen = openSocket;
-        socket.onmessage = showData;
-
+        socketSetup(wss_ip, wss_port);
         changePort = false;
     }else{
         if(wss_port != old_wss_port){
@@ -59,13 +54,7 @@ function draw() {
     }
 
     if(changeAddress){
-        // The socket connection needs two event listeners
-        // set them up here again
-        socket = new WebSocket("wss://"+ wss_ip +":" + wss_port);
-        socket.onopen = openSocket;
-        socket.onmessage = showData;
-        socket.onclose = sendClosed;
-
+        socketSetup(wss_ip, wss_port);
         changeAddress = false;
     }else{
         if(wss_ip != old_wss_ip){
@@ -124,8 +113,8 @@ var Controls = function() {
         fetchTrainedImage();
     };
 
-    this.server_port = 8081;
-    this.server_ip = "10.202.217.102";
+    this.server_port = 8080;
+    this.server_ip = "10.202.217.101";
 
 };
 
@@ -201,6 +190,16 @@ function fetchTrainedImage(){
     //--
 }
 
+function socketSetup(wss_ip, wss_port){
+    socket = new WebSocket("wss://"+ wss_ip +":" + wss_port);
+    // The socket connection event listeners
+    // set them up here
+    socket.onopen = openSocket;
+    socket.onmessage = showData;
+    // socket.onerror = closeSocket;
+    // socket.onclose = closeSocket;
+}
+
 
 function openSocket() {
     socket.send("Hello server");
@@ -208,9 +207,42 @@ function openSocket() {
  
 function showData(result) {
     // when the server returns, show the result in the div:
-    console.log("Server said: " + result.data);
+    var server_dump = JSON.parse(result.data);
+    console.log(server_dump);
+
+    if(server_dump.buttonOne == "HIGH"){
+        // -- clean data
+        console.log("clean data");
+
+        cleanData();
+    }
+
+    if(server_dump.buttonTwo == "HIGH"){
+        // -- take pictures
+        console.log("take pictures");
+
+        saveFrames("frames", "jpg", cp.Image_count, 1, function(data){
+            save_frames_server(data);
+        });
+    }
+
+    if(server_dump.buttonThree == "HIGH"){
+        // -- train model
+        console.log("train model");
+
+        trainImages();
+    }
+
+    if(server_dump.buttonFour == "HIGH"){
+        // -- show future
+        console.log("show future");
+
+        fetchTrainedImage();
+    }
+
+
 }
 
-function sendClosed(){
-    console.log("Server closed");
-}
+// function closeSocket(){
+//     console.log("Server closed");
+// }
