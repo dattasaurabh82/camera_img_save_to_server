@@ -94,3 +94,19 @@ And make it executable: <br>
 
 ### 9. Check: <br>
 `sudo reboot`
+
+
+# MAKING THE GUI ON BOOTABLE WSS PI0 SERVER WHICH SHOWS THE SERVER INNFO we can use in our web app to connect this physical controller: <br>
+It is using TKinter for python 2.7 which comes bydefault in raspberry Pi zero <br>
+### create a profile to appaer after boot and separate lxterminal session using absolute paths everywhere
+```
+sudo nano /etc/profile
+sudo python /home/pi/<path to script><filename>.py
+```
+In our case
+`sudo python /home/pi/gpio_testinfo.py`
+CTRLX, Y, ENTER
+```
+sudo nano /etc/xdg/lxsession/LXDE-pi/autostart
+@/usr/bin/python /home/pi/gpio_test/info.py
+```
