@@ -46,3 +46,49 @@ Then you can do
 `node server.js `
 in Pi zero to run the secure websocket server
 
+
+## Now How to make this server bootable:
+### 1. Install forever.js: <br>
+`sudo npm install forever -g`
+### 2. My NODE path is: <br>
+`/usr/local/bin/node` <br>
+### and node modules path is <br>
+`/usr/local/lib/node_modules` <br> 
+***[notes]: you can chcek where is your node by `which node`***
+### 3. In pi, My server is in folder(that is this folder) is in path: <br>
+`/home/pi/gpio_test/server.js`
+### 4. Create a service: <br> 
+`cd /etc/init.d`
+### 5. Fill it in: <br>
+`sudo nano myService` <br>
+Then type in ( accordingly chnage your paths if you ahve chnaged ) <br>
+```
+#!/bin/sh
+#/etc/init.d/myService
+export PATH=$PATH:/usr/local/bin
+export NODE_PATH=$NODE_PATH:/usr/local/lib/node_modules
+case "$1" in
+start)
+exec forever --sourceDir=/home/pi/gpio_test -p /home/pi/gpio_test server.js  #scriptarguments
+;;
+stop)
+exec forever stop --sourceDir=/home/pi/gpio_test server.js
+;;
+*)
+echo "Usage: /etc/init.d/myService {start|stop}"
+exit 1
+;;
+esac
+exit 0
+```
+And make it executable: <br>
+`chmod 755 /etc/init.d/myService ` <br>
+### 6. Check: <br>
+`sh /etc/init.d/myService start/stop` <br>
+### 7. Make it bootable: <br>
+`update-rc.d myService defaults`
+### 8. To remove form Boot: <br>
+`update-rc.d -f myService remove`
+
+### 9. Check: <br>
+`sudo reboot`
