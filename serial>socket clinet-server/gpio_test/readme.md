@@ -10,6 +10,8 @@ cd node-v4.4.5-linux-armv6l
 sudo cp -R * /usr/local/
 sudo reboot
 ```
+clone this repo(preferably in `/home/pi` {if you haven't chnaged the username}. BTW this is your default location when you ssh into pi) and then <br>
+`cd /home/pi/gpio_test`
 
 ### 2. Install node packages:
 ```
@@ -28,7 +30,8 @@ cp cert.pem sslcert/
 rm key.pem && rm cert.pem
 ```
 
-### 4. `node server.js`
+### 4. Test: <br>
+`node server.js`
 
 ### 5. authenticate:
 ::In pi::
@@ -42,9 +45,8 @@ Accept the **Risk**
 
 
 Then you can do 
-
 `node server.js `
-in Pi zero to run the secure websocket server
+to run the secure websocket server in Pi zero. 
 
 
 ## Now How to make this server bootable:
