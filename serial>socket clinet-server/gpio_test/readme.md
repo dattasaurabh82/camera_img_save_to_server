@@ -96,7 +96,7 @@ And make it executable: <br>
 `sudo reboot`
 
 
-# MAKING THE GUI ON BOOTABLE WSS PI0 SERVER WHICH SHOWS THE SERVER INNFO we can use in our web app to connect this physical controller: <br>
+# MAKING THE GUI ON BOOTABLE WSS Pi zero SERVER WHICH SHOWS THE SERVER INNFO we can use in our web app to connect this physical controller: <br>
 It is using TKinter for python 2.7 which comes bydefault in raspberry Pi zero <br>
 ### create a profile to appaer after boot and separate lxterminal session using absolute paths everywhere
 ```
