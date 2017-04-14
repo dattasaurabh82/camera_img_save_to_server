@@ -13,6 +13,8 @@ var changePort;
 var changeAddress;
 var wss_ip = "10.202.217.100";
 var old_wss_ip = "10.202.217.100";
+var connected = true;
+var connection_counter = 0;
 
 function setup() {
     createCanvas(640, 480);
@@ -196,8 +198,13 @@ function fetchTrainedImage(){
         url: "/show_data/", // particular endpoint
         data: flag,
         success: function(msg){
-            if(msg == "ok fetched"){
-                window.alert("Are you happy");
+            var clientFolder = msg.replace("ok fetch:", "");
+            var msgHeader = msg.slice(0, msg.indexOf(":"));
+
+            if (msgHeader == "ok fetch"){
+            //  // pull the image form th client's folder:
+                document.getElementById("futureImg").src="/data/" + clientFolder + "/ClientFuture/future.jpg";
+                window.alert("Are you happy with your future");
             }else if (msg == "no picture"){
                 window.alert("OOPs! No Future for you");
             }else{
@@ -213,53 +220,59 @@ function socketSetup(wss_ip, wss_port){
     // set them up here
     socket.onopen = openSocket;
     socket.onmessage = showData;
-    // socket.onerror = closeSocket;
-    // socket.onclose = closeSocket;
+    socket.onerror = closeSocket;
+    socket.onclose = closeSocket;
 }
 
 
 function openSocket() {
+    connected = true;
     socket.send("Hello server");
 }
  
 function showData(result) {
-    // when the server returns, show the result in the div:
-    var server_dump = JSON.parse(result.data);
-    console.log(server_dump);
+    if(connected){
+        // when the server returns, show the result:
+        var server_dump = JSON.parse(result.data);
+        console.log(server_dump);
 
-    if(server_dump.buttonOne == "HIGH"){
-        // -- clean data
-        console.log("clean data");
+        if(server_dump == "Connection confirmed"){
+            window.alert(server_dump);
+            console.log(server_dump);
+        }
+            
 
-        cleanData();
+        if(server_dump.buttonOne == "HIGH"){
+            // -- clean data
+            console.log("clean data");
+            cleanData();
+        }
+
+        if(server_dump.buttonTwo == "HIGH"){
+            // -- take pictures
+            console.log("take pictures");
+
+            saveFrames("frames", "jpg", cp.Image_count, 1, function(data){
+                save_frames_server(data);
+            });
+        }
+
+        if(server_dump.buttonThree == "HIGH"){
+            // -- train model
+            console.log("train model");
+            trainImages();
+        }
+
+        if(server_dump.buttonFour == "HIGH"){
+            // -- show future
+            console.log("show future");
+            fetchTrainedImage();
+        }
     }
-
-    if(server_dump.buttonTwo == "HIGH"){
-        // -- take pictures
-        console.log("take pictures");
-
-        saveFrames("frames", "jpg", cp.Image_count, 1, function(data){
-            save_frames_server(data);
-        });
-    }
-
-    if(server_dump.buttonThree == "HIGH"){
-        // -- train model
-        console.log("train model");
-
-        trainImages();
-    }
-
-    if(server_dump.buttonFour == "HIGH"){
-        // -- show future
-        console.log("show future");
-
-        fetchTrainedImage();
-    }
-
-
 }
 
-// function closeSocket(){
-//     console.log("Server closed");
-// }
+function closeSocket(){
+    connected = false;
+    console.log("something happened. Refresh the ports");
+    window.alert("something happened. Refresh the ports");
+}

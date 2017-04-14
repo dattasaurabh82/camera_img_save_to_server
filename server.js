@@ -4,13 +4,13 @@ var fs = require('fs');
 var bodyParser = require('body-parser');
 var shell = require('shelljs');
 
-
 var port = 3000;
 var PORT = process.env.PORT || 5000;
 var HOST = process.env.HOST || '';
 
 var req_counter = 0;
 var folder_path;
+
 var app = express();
 var server = app.listen(port);
 
@@ -32,7 +32,7 @@ app.post('/img_sent/', function(req, res) {
   if (req_counter <= 1){
     // create folders according to clients IP
     var folder_name = String(getClientIP(req.ip)).split('.').join('_');
-    folder_path = "./data/" + folder_name;
+    folder_path = "./public/data/" + folder_name;
     // console.log(folder_path);
     
     var client_future_folderPath = folder_path + "/ClientFuture";
@@ -77,14 +77,14 @@ app.post('/clean_data/', function(req, res){
   // they would be instantaniously different for diff clients and sessions
   // console.log(req.body);
   var folder_name = String(getClientIP(req.ip)).split('.').join('_');
-  var folder_path = "./data/" + folder_name;
+  var folder_path = "./public/data/" + folder_name;
   if (fs.existsSync(folder_path)){
     // if the folder exists
     // and you get a clean command
     if(req.body.status == 'clean'){
       // clean up any older images in the folder
       // shell.rm('-rf', 'data/' + folder_name + '/*');
-      shell.rm('data/' + folder_name + '/*');
+      shell.rm('public/data/' + folder_name + '/*');
     }
   }
   res.send('ok cleaned');
@@ -95,24 +95,22 @@ app.post('/show_data/', function(req, res){
   // I'm checking every time folder path and names and not resusing them as 
   // they would be instantaniously different for diff clients and sessions
   var curr_client_folder_name = String(getClientIP(req.ip)).split('.').join('_');
-  var curr_client_folder_path = "./data/" + curr_client_folder_name;
+  var curr_client_folder_path = "./public/data/" + curr_client_folder_name;
   var client_future_folderPath = curr_client_folder_path + "/ClientFuture";
+  var future_file_name = "future.jpg";
+  var future_file_path = client_future_folderPath + "/" + future_file_name;
 
   // If the sub folder exists
   if (fs.existsSync(client_future_folderPath)){
     // and matches the tag
     if(req.body.status == 'show_future'){
       fs.readdir(client_future_folderPath, function(err, files){
-        // and if it's not empty
-        // and contains only one file
-        console.log(files.length);
-        if(files.length == 2){
-          //send the file to client
-          res.send('ok fetched');
-        }else if (files.length <= 1){
+        if(files.length >= 1){
+          res.send('ok fetch:' + curr_client_folder_name);
+        }else if (files.length < 1){
           res.send('no picture');
-        }else {
-          res.send('too many pictures');
+        }else{
+          res.send('not in scope for more than 1 picture');
         }
       });
     }

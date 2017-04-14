@@ -18,9 +18,9 @@ function switchOne(err, state) {
     if(state == 1) {
       console.log("pressedOne");
       buttonStates.buttonOne = "HIGH";
-      if (sendData) {
-        broadcast(buttonStates);
-      }
+      
+      broadcast(buttonStates);
+      
       console.log(buttonStates);
     }else{
       buttonStates.buttonOne = "LOW";
@@ -35,9 +35,9 @@ function switchTwo(err, state) {
     if(state == 1) {
       console.log("pressedTwo");
       buttonStates.buttonTwo = "HIGH";
-      if (sendData) {
-        broadcast(buttonStates);
-      }
+      
+      broadcast(buttonStates);
+      
       console.log(buttonStates);
     }else{
       buttonStates.buttonTwo = "LOW";
@@ -52,9 +52,9 @@ function switchThree(err, state) {
     if(state == 1) {
       console.log("pressedThree");
       buttonStates.buttonThree = "HIGH";
-      if (sendData) {
-        broadcast(buttonStates);
-      }
+      
+      broadcast(buttonStates);
+      
       console.log(buttonStates);
     }else{
       buttonStates.buttonThree = "LOW";
@@ -69,9 +69,9 @@ function switchFour(err, state) {
     if(state == 1) {
       console.log("pressedFour");
       buttonStates.buttonFour = "HIGH";
-      if (sendData) {
-        broadcast(buttonStates);
-      }
+      
+      broadcast(buttonStates);
+      
       console.log(buttonStates);
     }else{
       buttonStates.buttonFour = "LOW";
@@ -122,7 +122,7 @@ var wss = new WebSocketServer({
   server: httpsServer
 });
 
-var connections = new Array(10);
+var connections = new Array();
 
 var msgFromServer = "Connection confirmed";
 var sendData = false;
