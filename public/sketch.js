@@ -188,6 +188,23 @@ function trainImages(){
 
 function fetchTrainedImage(){
     //--
+    var flag = {};
+    flag.status = "show_future";
+    // print(flag);
+    $.ajax({
+        type: "POST",
+        url: "/show_data/", // particular endpoint
+        data: flag,
+        success: function(msg){
+            if(msg == "ok fetched"){
+                window.alert("Are you happy");
+            }else if (msg == "no picture"){
+                window.alert("OOPs! No Future for you");
+            }else{
+                window.alert("Not in scope yet");
+            }
+        }
+    });
 }
 
 function socketSetup(wss_ip, wss_port){
