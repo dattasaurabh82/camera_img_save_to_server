@@ -14,7 +14,6 @@ var changeAddress;
 var wss_ip = "10.202.217.100";
 var old_wss_ip = "10.202.217.100";
 var connected = true;
-var connection_counter = 0;
 
 function setup() {
     createCanvas(640, 480);
@@ -204,7 +203,7 @@ function fetchTrainedImage(){
             if (msgHeader == "ok fetch"){
             //  // pull the image form th client's folder:
                 document.getElementById("futureImg").src="/data/" + clientFolder + "/ClientFuture/future.jpg";
-                window.alert("Are you happy with your future");
+                // window.alert("Are you happy with your future"); // insert div element
             }else if (msg == "no picture"){
                 window.alert("OOPs! No Future for you");
             }else{
@@ -237,7 +236,8 @@ function showData(result) {
         console.log(server_dump);
 
         if(server_dump == "Connection confirmed"){
-            window.alert(server_dump);
+            document.getElementById("notConnected").style.visibility = "hidden";
+            document.getElementById("connected").style.visibility = "visible";
             console.log(server_dump);
         }
             
@@ -274,5 +274,10 @@ function showData(result) {
 function closeSocket(){
     connected = false;
     console.log("something happened. Refresh the ports");
-    window.alert("something happened. Refresh the ports");
+    document.getElementById("notConnected").style.visibility = "visible";
+    document.getElementById("connected").style.visibility = "hidden";
 }
+
+
+
+
