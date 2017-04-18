@@ -77,8 +77,7 @@ app.post('/vid_sent/', function(req, res){
 
 
 function formatConverter(inputwebm, outputmp4){
-  console.log(inputwebm);
-  // console.log(__dirname + outputmp4);
+  // convert webm to mp4 with ffmpeg
   var ffmpeg_cmd = "sudo ffmpeg -i \"" + __dirname + inputwebm + "\" -qscale 0 \"" + __dirname + outputmp4 + "\"";
   exec(ffmpeg_cmd, function(err, stdout, stderr){
     console.log(err);
@@ -86,12 +85,25 @@ function formatConverter(inputwebm, outputmp4){
     console.log(stdout);
     console.log("Done conversion");
   });
-  //rm webm file
+  //after conversion rm webm file
   inputwebm = inputwebm.slice(1, inputwebm.length);
   console.log(inputwebm);
   shell.rm(inputwebm);
   console.log("removed webm file");
 }
+
+app.post('/clean_video/', function(req, res){
+  var folder_name = String(getClientIP(req.ip)).split('.').join('_');
+  var folder_path = "./public/data/" + folder_name;
+  var training_video_folderPath = folder_path + "/TrainingVideo";
+
+  if (fs.existsSync(training_video_folderPath)){
+    if(req.body.status == 'cleanVid'){
+      shell.rm('public/data/' + folder_name + '/TrainingVideo/*');
+    }
+  }
+  res.send('ok cleaned video');
+});
 
 app.post('/img_sent/', function(req, res) {
   // console.log(getClientIP(req.ip));

@@ -94,7 +94,21 @@ var initGUI = function() {
 var Controls = function() {
     // ---------- Pre training
     this.Clean_old_video = function(){
-
+        var flag = {};
+        flag.status = "cleanVid";
+        // print(flag);
+        $.ajax({
+            type: "POST",
+            url: "/clean_video/", // particular endpoint
+            data: flag,
+            success: function(msg){
+                if(msg == "ok cleaned video"){
+                    window.alert("Cleaned old Video data from server.\nYou can save new video");
+                }else{
+                    window.alert("didn't get the msg from server");
+                }
+            }
+        });
     };
 
     this.Video_duration = 3;
@@ -305,7 +319,7 @@ function closeSocket(){
 }
 
 const chunks = [];
-var c = 0;
+
 function record(delay) {
     console.log(delay*1000);
     chunks.length = 0;
@@ -314,8 +328,6 @@ function record(delay) {
     recorder.ondataavailable = e => {
         if (e.data.size) {
             chunks.push(e.data);
-            c = c+ 1;
-            console.log(c);
         }
     };
 
