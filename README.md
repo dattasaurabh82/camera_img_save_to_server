@@ -2,7 +2,7 @@
 ## This is running on the  server hosting the browserapp. 
 
 ## Install required packages:
-`npm install`
+`sudo npm install`
 
 ## For secure connection:
 ### Generate self signed ssl certificates:
