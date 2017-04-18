@@ -15,6 +15,8 @@ var wss_ip = "10.202.217.100";
 var old_wss_ip = "10.202.217.100";
 var connected = true;
 
+var delay = 2000;
+
 function setup() {
     createCanvas(640, 480);
 
@@ -25,8 +27,10 @@ function setup() {
     //---------- GUI SETUP ---------//
     cp = new Controls();
     gui = new dat.GUI();
-    f1 = gui.addFolder('GENERAL IMAGE CONTROLS');
+    f0 = gui.addFolder('PRE-TRAINING');
+    f1 = gui.addFolder('POST-TRAINING');
     f2 = gui.addFolder('WS BUTTON CONTROL PARAMS');
+    f0.open();
     f1.open();
     f2.open();
     initGUI();
@@ -70,7 +74,12 @@ function draw() {
 
 var speeder ;
 var initGUI = function() {
-    f1.add(cp, 'Clean_old_data');
+    f0.add(cp, 'Clean_old_video');
+    f0.add(cp, 'Video_duration', 1, 10).step(1);
+    f0.add(cp, 'Save_video');
+    f0.add(cp, 'Curr_video');
+
+    f1.add(cp, 'RMV_old_images');
     f1.add(cp, 'Image_count', 1, 10).step(1);
     f1.add(cp, 'Save_images');
     f1.add(cp, 'Train_images');
@@ -83,7 +92,23 @@ var initGUI = function() {
 
 
 var Controls = function() {
-    this.Clean_old_data = function(){
+    // ---------- Pre training
+    this.Clean_old_video = function(){
+
+    };
+
+    this.Video_duration = 3;
+
+    this.Save_video = function(){
+        record(this.Video_duration);
+    };
+
+    this.Curr_video = function(){
+        
+    };
+
+    // ----------- Post training
+    this.RMV_old_images = function(){
         cleanData();
     };
 
@@ -114,6 +139,7 @@ var Controls = function() {
         fetchTrainedImage();
     };
 
+    // ------------ WSS server config
     this.server_port = 8080;
     this.server_ip = "10.202.217.101";
 
@@ -135,6 +161,7 @@ function b64_creation(img_data){
     // Remove the headers from 'data..' till '..base64,'
     var sliced_bs6_data = raw_bs6_data.replace(/^data:image\/octet-stream;base64,/,'');
     //put it back in the image object. 
+    // console.log(sliced_bs6_data);
     img_data.imageData = sliced_bs6_data;
 
     //------------ SEND THE IMAGE DATA ------------//
@@ -203,7 +230,6 @@ function fetchTrainedImage(){
             if (msgHeader == "ok fetch"){
             //  // pull the image form th client's folder:
                 document.getElementById("futureImg").src="/data/" + clientFolder + "/ClientFuture/future.jpg";
-                // window.alert("Are you happy with your future"); // insert div element
             }else if (msg == "no picture"){
                 window.alert("OOPs! No Future for you");
             }else{
@@ -276,6 +302,58 @@ function closeSocket(){
     console.log("something happened. Refresh the ports");
     document.getElementById("notConnected").style.visibility = "visible";
     document.getElementById("connected").style.visibility = "hidden";
+}
+
+const chunks = [];
+
+function record(delay) {
+    console.log(delay*1000);
+    chunks.length = 0;
+    let stream = document.querySelector('canvas').captureStream(30),
+        recorder = new MediaRecorder(stream);
+    recorder.ondataavailable = e => {
+        if (e.data.size) {
+            chunks.push(e.data);
+        }
+    };
+
+    recorder.start();
+    setTimeout(function() {
+        recorder.stop();
+        recorder.onstop = exportVideoWithBS64;
+    }, delay*1000);
+}
+
+function exportVideoWithBS64(e) {
+    console.log("stopped");
+    var vid_data = {data: ''};
+    
+    var blob = new Blob(chunks);
+    var reader = new window.FileReader();
+    reader.readAsDataURL(blob);
+    reader.onloadend = function() {
+        base64data = reader.result;
+        // console.log(base64data);
+        var cleanBS64VidData = base64data.substr(base64data.indexOf(',')+1);
+        vid_data.data = cleanBS64VidData;
+        console.log(vid_data);
+
+        //------------ SEND THE VIDEO DATA TO SERVER ------------//
+        $.ajax({
+            type: "POST",
+            url: "/vid_sent/",
+            data: vid_data,
+            success: function(msg){
+                if(msg == "ok video rcvd"){
+                    window.alert("Saved video in server");
+                    console.log("Server said: video data received");
+                }else{
+                    print("didn't get the msg");
+                    window.alert("didn't get the msg");
+                }
+            }
+        });
+    }
 }
 
 

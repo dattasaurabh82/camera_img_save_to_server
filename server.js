@@ -18,10 +18,45 @@ var server = app.listen(port);
 app.use(express.static('public'));
 // We have to increase the file intake capacity of the parser
 // as our bs64 string is huge
-app.use(bodyParser.json({type: 'application/*+json', limit: '50mb'}));
-app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
+app.use(bodyParser.json({type: 'application/*+json', limit: '200mb'}));
+app.use(bodyParser.urlencoded({limit: '200mb', extended: true}));
 
 app.enable('trust proxy');
+
+app.post('/vid_sent/', function(req, res){
+  // To create the folders once only on subsequent post requests
+  var folder_path = "";
+  // create folders according to clients IP
+  var folder_name = String(getClientIP(req.ip)).split('.').join('_');
+  folder_path = "./public/data/" + folder_name;
+  var training_video_folderPath = folder_path + "/TrainingVideo";
+
+  console.log(folder_path);
+  // if the main client folder doesn't exist create one
+  if (!fs.existsSync(folder_path)){
+    fs.mkdirSync(folder_path);
+    console.log("made " + folder_path);
+  }else{
+      console.log("folder: " + folder_path + " exists");
+  }
+  // if the sub folder doesn't exist create one
+  if(!fs.existsSync(training_video_folderPath)){
+    fs.mkdirSync(training_video_folderPath);
+    console.log("made client's future folder " + "\" " + training_video_folderPath + " \"");
+  }else{
+    console.log("folder: " + training_video_folderPath + " exists");
+    console.log("saving the file");
+  }
+
+
+  // get the data write thr buffer to the file in the dedicated folder 
+  var vid_object = req.body;
+  // console.log(vid_object.data);
+  var buff = new Buffer(vid_object.data, 'base64');
+  fs.writeFileSync(training_video_folderPath + '/' + 'raw.webm', buff);
+  console.log('video saved in folder: ' + training_video_folderPath + '/');
+  res.send('ok video rcvd');
+});
 
 app.post('/img_sent/', function(req, res) {
   // console.log(getClientIP(req.ip));
