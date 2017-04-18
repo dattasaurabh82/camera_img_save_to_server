@@ -3,6 +3,9 @@ var https = require('https');
 var fs = require('fs');
 var bodyParser = require('body-parser');
 var shell = require('shelljs');
+// var hbjs = require("handbrake-js");
+var ffmpeg = require('fluent-ffmpeg');
+
 
 var port = 3000;
 var PORT = process.env.PORT || 5000;
@@ -23,6 +26,9 @@ app.use(bodyParser.urlencoded({limit: '200mb', extended: true}));
 
 app.enable('trust proxy');
 
+var inputwebm;
+var outputmp4;
+
 app.post('/vid_sent/', function(req, res){
   // To create the folders once only on subsequent post requests
   var folder_path = "";
@@ -31,7 +37,7 @@ app.post('/vid_sent/', function(req, res){
   folder_path = "./public/data/" + folder_name;
   var training_video_folderPath = folder_path + "/TrainingVideo";
 
-  console.log(folder_path);
+  // console.log(folder_path);
   // if the main client folder doesn't exist create one
   if (!fs.existsSync(folder_path)){
     fs.mkdirSync(folder_path);
@@ -48,15 +54,34 @@ app.post('/vid_sent/', function(req, res){
     console.log("saving the file");
   }
 
-
   // get the data write thr buffer to the file in the dedicated folder 
   var vid_object = req.body;
   // console.log(vid_object.data);
   var buff = new Buffer(vid_object.data, 'base64');
-  fs.writeFileSync(training_video_folderPath + '/' + 'raw.webm', buff);
+  fs.writeFileSync(training_video_folderPath + '/raw.webm', buff);
   console.log('video saved in folder: ' + training_video_folderPath + '/');
+  // console.log('converting from webm to mp4');
+  
+  var inputwebm = training_video_folderPath + '/raw.webm';
+  inputwebm = inputwebm.replace(".", "");
+  var outputmp4 = training_video_folderPath + '/raw.mp4';
+  outputmp4 = outputmp4.replace(".", "");
+  formatConverter(inputwebm, outputmp4);
+
   res.send('ok video rcvd');
 });
+
+
+function formatConverter(inputwebm, outputmp4){
+  // console.log(inputwebm);
+  // console.log(outputmp4);
+  // ffmpeg(inputwebm).on('error', function(err) {
+  //   console.log('An error occurred: ' + err.message);
+  // }).on('end', function() {
+  //   console.log('Processing finished !');
+  // }).save(outputmp4);
+
+}
 
 app.post('/img_sent/', function(req, res) {
   // console.log(getClientIP(req.ip));
