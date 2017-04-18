@@ -3,8 +3,7 @@ var https = require('https');
 var fs = require('fs');
 var bodyParser = require('body-parser');
 var shell = require('shelljs');
-// var hbjs = require("handbrake-js");
-var ffmpeg = require('fluent-ffmpeg');
+var exec = require('child_process').execSync;
 
 
 var port = 3000;
@@ -52,16 +51,21 @@ app.post('/vid_sent/', function(req, res){
   }else{
     console.log("folder: " + training_video_folderPath + " exists");
     console.log("saving the file");
+    //delete content in the subfolder that has been there
+    rmv_content_path = training_video_folderPath.replace("./", "");
+    shell.rm(training_video_folderPath + '/*');
   }
 
-  // get the data write thr buffer to the file in the dedicated folder 
+  // get the data write the buffer to the file in the dedicated folder 
   var vid_object = req.body;
   // console.log(vid_object.data);
   var buff = new Buffer(vid_object.data, 'base64');
   fs.writeFileSync(training_video_folderPath + '/raw.webm', buff);
   console.log('video saved in folder: ' + training_video_folderPath + '/');
-  // console.log('converting from webm to mp4');
   
+  console.log('converting from webm to mp4');
+  
+  //format paths for conversion of webm file to mp4
   var inputwebm = training_video_folderPath + '/raw.webm';
   inputwebm = inputwebm.replace(".", "");
   var outputmp4 = training_video_folderPath + '/raw.mp4';
@@ -73,14 +77,20 @@ app.post('/vid_sent/', function(req, res){
 
 
 function formatConverter(inputwebm, outputmp4){
-  // console.log(inputwebm);
-  // console.log(outputmp4);
-  // ffmpeg(inputwebm).on('error', function(err) {
-  //   console.log('An error occurred: ' + err.message);
-  // }).on('end', function() {
-  //   console.log('Processing finished !');
-  // }).save(outputmp4);
-
+  console.log(inputwebm);
+  // console.log(__dirname + outputmp4);
+  var ffmpeg_cmd = "sudo ffmpeg -i \"" + __dirname + inputwebm + "\" -qscale 0 \"" + __dirname + outputmp4 + "\"";
+  exec(ffmpeg_cmd, function(err, stdout, stderr){
+    console.log(err);
+    console.log(stdout);
+    console.log(stdout);
+    console.log("Done conversion");
+  });
+  //rm webm file
+  inputwebm = inputwebm.slice(1, inputwebm.length);
+  console.log(inputwebm);
+  shell.rm(inputwebm);
+  console.log("removed webm file");
 }
 
 app.post('/img_sent/', function(req, res) {

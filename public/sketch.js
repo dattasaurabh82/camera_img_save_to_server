@@ -75,9 +75,9 @@ function draw() {
 var speeder ;
 var initGUI = function() {
     f0.add(cp, 'Clean_old_video');
-    f0.add(cp, 'Video_duration', 1, 10).step(1);
+    f0.add(cp, 'Video_duration', 1, 60).step(1);
     f0.add(cp, 'Save_video');
-    f0.add(cp, 'Curr_video');
+    f0.add(cp, 'Train_video');
 
     f1.add(cp, 'RMV_old_images');
     f1.add(cp, 'Image_count', 1, 10).step(1);
@@ -103,7 +103,7 @@ var Controls = function() {
         record(this.Video_duration);
     };
 
-    this.Curr_video = function(){
+    this.Train_video = function(){
         
     };
 
@@ -305,7 +305,7 @@ function closeSocket(){
 }
 
 const chunks = [];
-
+var c = 0;
 function record(delay) {
     console.log(delay*1000);
     chunks.length = 0;
@@ -314,6 +314,8 @@ function record(delay) {
     recorder.ondataavailable = e => {
         if (e.data.size) {
             chunks.push(e.data);
+            c = c+ 1;
+            console.log(c);
         }
     };
 
