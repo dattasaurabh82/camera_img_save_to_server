@@ -245,6 +245,7 @@ function record(delay) {
     // console.log(delay*1000);
     print("recording");
     document.getElementById("vidStatus").innerHTML="RECORDING VIDEO";
+    document.getElementById("vidStatus").style.color = "#DB5F89";
     chunks.length = 0;
     let stream = document.querySelector('canvas').captureStream(30),
         recorder = new MediaRecorder(stream);
@@ -263,6 +264,7 @@ function record(delay) {
 
 function exportVideoWithBS64(e) {
     document.getElementById("vidStatus").innerHTML="EXPORTING VIDEO";
+    document.getElementById("vidStatus").style.color = "#DB5F89";
     var vid_data = {data: ''};
     
     var blob = new Blob(chunks);
@@ -286,24 +288,30 @@ function exportVideoWithBS64(e) {
                     // window.alert("Saved video in server");
                     print("video saved in server.");
                     document.getElementById("vidStatus").innerHTML="VIDEO SAVED IN SERVER";
+                    document.getElementById("vidStatus").style.color = "#2FA1D6";
                     //DELAY 
                     setTimeout(function() {
                         document.getElementById("vidStatus").innerHTML="RECORD VIDEO";
+                        document.getElementById("vidStatus").style.color = "#FFCC00";
                     }, 5000);
                 }else if (mag == "video conversion error"){
                     print("there was a conversion error");
                     document.getElementById("vidStatus").innerHTML="VIDEO CONVERSION ERROR. Check server";
+                    document.getElementById("vidStatus").style.color = "#FC3164";
                 }
             },
             error: function(data){
                 document.getElementById("vidStatus").innerHTML="INTERNAL ERROR. Check server";
+                document.getElementById("vidStatus").style.color = "#FC3164";
             },
             statusCode: {
                 500: function() {
                   document.getElementById("vidStatus").innerHTML="SCRIPT EXHAUSTED. Check server";
+                  document.getElementById("vidStatus").style.color = "#FC3164";
                 },
                 503: function(){
                     document.getElementById("vidStatus").innerHTML="SERVER UNAVAILABLE. Check server";
+                    document.getElementById("vidStatus").style.color = "#FC3164";
                 },
             }
         });
@@ -324,10 +332,12 @@ function deleteOldVideo(delay){
                     //DELAY
                     setTimeout(function() {
                         document.getElementById("vidStatus").innerHTML="RECORD VIDEO";
+                        document.getElementById("vidStatus").style.color = "#FFCC00";
                     }, delay);
                 }else{
                     
                     document.getElementById("vidStatus").innerHTML="THERE WAS AN ERROR IN DELETION";
+                    document.getElementById("vidStatus").style.color = "#FC3164";
                 }
             }
         });
