@@ -75,7 +75,7 @@ function draw() {
 var speeder ;
 var initGUI = function() {
     f0.add(cp, 'Clean_old_video');
-    f0.add(cp, 'Video_duration', 1, 60).step(1);
+    f0.add(cp, 'Video_duration', 1, 30).step(1);
     f0.add(cp, 'Save_video');
     f0.add(cp, 'Train_video');
 
@@ -94,21 +94,7 @@ var initGUI = function() {
 var Controls = function() {
     // ---------- Pre training
     this.Clean_old_video = function(){
-        var flag = {};
-        flag.status = "cleanVid";
-        // print(flag);
-        $.ajax({
-            type: "POST",
-            url: "/clean_video/", // particular endpoint
-            data: flag,
-            success: function(msg){
-                if(msg == "ok cleaned video"){
-                    window.alert("Cleaned old Video data from server.\nYou can save new video");
-                }else{
-                    window.alert("didn't get the msg from server");
-                }
-            }
-        });
+        deleteOldVideo(5000);
     };
 
     this.Video_duration = 3;
@@ -253,6 +239,101 @@ function fetchTrainedImage(){
     });
 }
 
+const chunks = [];
+
+function record(delay) {
+    // console.log(delay*1000);
+    print("recording");
+    document.getElementById("vidStatus").innerHTML="RECORDING VIDEO";
+    chunks.length = 0;
+    let stream = document.querySelector('canvas').captureStream(30),
+        recorder = new MediaRecorder(stream);
+    recorder.ondataavailable = e => {
+        if (e.data.size) {
+            chunks.push(e.data);
+        }
+    };
+
+    recorder.start();
+    setTimeout(function() {
+        recorder.stop();
+        recorder.onstop = exportVideoWithBS64;
+    }, delay*1000);
+}
+
+function exportVideoWithBS64(e) {
+    document.getElementById("vidStatus").innerHTML="EXPORTING VIDEO";
+    var vid_data = {data: ''};
+    
+    var blob = new Blob(chunks);
+    var reader = new window.FileReader();
+    reader.readAsDataURL(blob);
+    reader.onloadend = function() {
+        base64data = reader.result;
+        // console.log(base64data);
+        var cleanBS64VidData = base64data.substr(base64data.indexOf(',')+1);
+        vid_data.data = cleanBS64VidData;
+        // console.log(vid_data);
+
+        //------------ SEND THE VIDEO DATA TO SERVER ------------//
+        // console.log("Recorded. Sending now");
+        $.ajax({
+            type: "POST",
+            url: "/vid_sent/",
+            data: vid_data,
+            success: function(msg){
+                if(msg == "ok video rcvd"){
+                    // window.alert("Saved video in server");
+                    print("video saved in server.");
+                    document.getElementById("vidStatus").innerHTML="VIDEO SAVED IN SERVER";
+                    //DELAY 
+                    setTimeout(function() {
+                        document.getElementById("vidStatus").innerHTML="RECORD VIDEO";
+                    }, 5000);
+                }else if (mag == "video conversion error"){
+                    print("there was a conversion error");
+                    document.getElementById("vidStatus").innerHTML="VIDEO CONVERSION ERROR. Check server";
+                }
+            },
+            error: function(data){
+                document.getElementById("vidStatus").innerHTML="INTERNAL ERROR. Check server";
+            },
+            statusCode: {
+                500: function() {
+                  document.getElementById("vidStatus").innerHTML="SCRIPT EXHAUSTED. Check server";
+                },
+                503: function(){
+                    document.getElementById("vidStatus").innerHTML="SERVER UNAVAILABLE. Check server";
+                },
+            }
+        });
+    }
+}
+
+function deleteOldVideo(delay){
+    var flag = {};
+        flag.status = "cleanVid";
+        // print(flag);
+        $.ajax({
+            type: "POST",
+            url: "/clean_video/", // particular endpoint
+            data: flag,
+            success: function(msg){
+                if(msg == "ok cleaned video"){
+                    document.getElementById("vidStatus").innerHTML="DELETED OLD VIDEO";
+                    //DELAY
+                    setTimeout(function() {
+                        document.getElementById("vidStatus").innerHTML="RECORD VIDEO";
+                    }, delay);
+                }else{
+                    
+                    document.getElementById("vidStatus").innerHTML="THERE WAS AN ERROR IN DELETION";
+                }
+            }
+        });
+}
+
+
 function socketSetup(wss_ip, wss_port){
     socket = new WebSocket("wss://"+ wss_ip +":" + wss_port);
     // The socket connection event listeners
@@ -318,57 +399,10 @@ function closeSocket(){
     document.getElementById("connected").style.visibility = "hidden";
 }
 
-const chunks = [];
 
-function record(delay) {
-    console.log(delay*1000);
-    chunks.length = 0;
-    let stream = document.querySelector('canvas').captureStream(30),
-        recorder = new MediaRecorder(stream);
-    recorder.ondataavailable = e => {
-        if (e.data.size) {
-            chunks.push(e.data);
-        }
-    };
 
-    recorder.start();
-    setTimeout(function() {
-        recorder.stop();
-        recorder.onstop = exportVideoWithBS64;
-    }, delay*1000);
-}
 
-function exportVideoWithBS64(e) {
-    console.log("stopped");
-    var vid_data = {data: ''};
-    
-    var blob = new Blob(chunks);
-    var reader = new window.FileReader();
-    reader.readAsDataURL(blob);
-    reader.onloadend = function() {
-        base64data = reader.result;
-        // console.log(base64data);
-        var cleanBS64VidData = base64data.substr(base64data.indexOf(',')+1);
-        vid_data.data = cleanBS64VidData;
-        console.log(vid_data);
 
-        //------------ SEND THE VIDEO DATA TO SERVER ------------//
-        $.ajax({
-            type: "POST",
-            url: "/vid_sent/",
-            data: vid_data,
-            success: function(msg){
-                if(msg == "ok video rcvd"){
-                    window.alert("Saved video in server");
-                    console.log("Server said: video data received");
-                }else{
-                    print("didn't get the msg");
-                    window.alert("didn't get the msg");
-                }
-            }
-        });
-    }
-}
 
 
 

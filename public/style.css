@@ -57,3 +57,15 @@ canvas {
   color: green;
   visibility: hidden;
 }
+
+#videoStates{
+  font-family: Monospace;
+  font-size: 12px;
+}
+
+#vidStatus{
+  position: absolute;
+  top: 480px;
+  left: 150px;
+  color: #2FA1D6;
+}

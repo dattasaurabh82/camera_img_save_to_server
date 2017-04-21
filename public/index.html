@@ -10,20 +10,28 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.5/p5.js" type="text/javascript"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.5/addons/p5.dom.js" type="text/javascript"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.5/addons/p5.sound.js" type="text/javascript"></script>
-    <script src="sketch.js" type="text/javascript"></script>
+    <script src="libraries/simple-console.js" type="text/javascript"></script>
+    <link rel="stylesheet" type="text/css" href="libraries/simple-console.css">
+    
+    <!-- page style -->
     <link rel="stylesheet" type="text/css" href="style.css">
-
+    <!-- P5 main sketch file  -->
+    <script src="sketch.js" type="text/javascript"></script>
     <!-- dom animation easter egg -->
     <script src="easterEgg.js" type="text/javascript"></script>
 </head>
 
 <body>
     <div id="frameLabels">
-        <p id="currentView">CURRENT VIEW</p>
-        <p id="futureFrame">FUTURE FRAME</p>
+        <p id="currentView">CURRENT VIEW:</p>
+        <p id="futureFrame">FUTURE FRAME:</p>
     </div>
 
     <img id="futureImg" src="" alt="future_img" />
+
+    <div id="videoStates">
+        <p id="vidStatus">RECORD VIDEO</p>
+    </div>
 
     <div id="connectionStatus">
         <p id="notConnected">NOT CONNECTED TO HARWARE CONTROL. <br> > Refresh ports by changing them.</p>

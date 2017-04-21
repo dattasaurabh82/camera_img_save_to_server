@@ -3,7 +3,6 @@ var https = require('https');
 var fs = require('fs');
 var bodyParser = require('body-parser');
 var shell = require('shelljs');
-var exec = require('child_process').execSync;
 
 
 var port = 3000;
@@ -12,6 +11,13 @@ var HOST = process.env.HOST || '';
 
 var req_counter = 0;
 var folder_path;
+
+var inputwebm;
+var outputmp4;
+var server_response = "video conversion error";
+
+var inputFileName = "raw.webm";
+var outputFileName = "raw.mp4";
 
 var app = express();
 var server = app.listen(port);
@@ -25,10 +31,10 @@ app.use(bodyParser.urlencoded({limit: '200mb', extended: true}));
 
 app.enable('trust proxy');
 
-var inputwebm;
-var outputmp4;
+
 
 app.post('/vid_sent/', function(req, res){
+  console.log("recording");
   // To create the folders once only on subsequent post requests
   var folder_path = "";
   // create folders according to clients IP
@@ -50,46 +56,53 @@ app.post('/vid_sent/', function(req, res){
     console.log("made client's future folder " + "\" " + training_video_folderPath + " \"");
   }else{
     console.log("folder: " + training_video_folderPath + " exists");
-    console.log("saving the file");
-    //delete content in the subfolder that has been there
+    console.log("removing any old file");
+    // delete content in the subfolder that has been there
+    // if there is no contenet a 'rm' command doesn't hurt
     rmv_content_path = training_video_folderPath.replace("./", "");
-    shell.rm(training_video_folderPath + '/*');
+    shell.rm(rmv_content_path + '/*');
   }
 
+  console.log("saving the file");
   // get the data write the buffer to the file in the dedicated folder 
   var vid_object = req.body;
   // console.log(vid_object.data);
   var buff = new Buffer(vid_object.data, 'base64');
   fs.writeFileSync(training_video_folderPath + '/raw.webm', buff);
   console.log('video saved in folder: ' + training_video_folderPath + '/');
-  
-  console.log('converting from webm to mp4');
-  
+  console.log('converting from raw.webm to raw.mp4');
   //format paths for conversion of webm file to mp4
   var inputwebm = training_video_folderPath + '/raw.webm';
   inputwebm = inputwebm.replace(".", "");
   var outputmp4 = training_video_folderPath + '/raw.mp4';
   outputmp4 = outputmp4.replace(".", "");
+  // server_response = ""; // this is modified accordingly in th enext function
   formatConverter(inputwebm, outputmp4);
-
-  res.send('ok video rcvd');
+  console.log(server_response);
+  res.send(server_response);
 });
-
 
 function formatConverter(inputwebm, outputmp4){
   // convert webm to mp4 with ffmpeg
   var ffmpeg_cmd = "sudo ffmpeg -i \"" + __dirname + inputwebm + "\" -qscale 0 \"" + __dirname + outputmp4 + "\"";
-  exec(ffmpeg_cmd, function(err, stdout, stderr){
-    console.log(err);
-    console.log(stdout);
-    console.log(stdout);
-    console.log("Done conversion");
-  });
-  //after conversion rm webm file
-  inputwebm = inputwebm.slice(1, inputwebm.length);
-  console.log(inputwebm);
-  shell.rm(inputwebm);
-  console.log("removed webm file");
+  // var ffmpegOutPut = shell.exec(ffmpeg_cmd, {silent:true}).stdout;
+  shell.exec(ffmpeg_cmd, {silent:true});
+
+  //check the mp4 file exists .. 
+  //then conversion was successful 
+  var mpFilePath = "." + outputmp4;
+  if (fs.existsSync(mpFilePath)) {
+    console.log('converted raw.webm to raw.mp4');
+    // After conversion rm webm file
+    inputwebm = inputwebm.slice(1, inputwebm.length);
+    shell.rm(inputwebm);
+    console.log("Removed webm file");
+    server_response = "ok video rcvd";
+  }else{
+    console.log('There was an conversion error');
+    server_response = "video conversion error";
+  }
+  return server_response;
 }
 
 app.post('/clean_video/', function(req, res){
