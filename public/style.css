@@ -58,9 +58,10 @@ canvas {
   visibility: hidden;
 }
 
-#videoStates{
+#trainingStatus{
   font-family: Monospace;
   font-size: 12px;
+  visibility: hidden;
 }
 
 #vidStatus{
@@ -70,4 +71,17 @@ canvas {
   color:#FFCC00;
 }
 
-/*#2FA1D6; */
+#testStatus{
+  font-family: Monospace;
+  font-size: 12px;
+  visibility: visible;
+}
+
+#pictureStatus{
+  position: absolute;
+  top: 480px;
+  left: 150px;
+  color:#FFCC00;
+}
+
+/* */

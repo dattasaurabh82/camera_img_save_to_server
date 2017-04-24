@@ -30,7 +30,7 @@ function setup() {
     f0 = gui.addFolder('PRE-TRAINING');
     f1 = gui.addFolder('POST-TRAINING');
     f2 = gui.addFolder('WS BUTTON CONTROL PARAMS');
-    f0.open();
+    f0.close();
     f1.open();
     f2.open();
     initGUI();
@@ -82,7 +82,7 @@ var initGUI = function() {
     f1.add(cp, 'RMV_old_images');
     f1.add(cp, 'Image_count', 1, 10).step(1);
     f1.add(cp, 'Save_images');
-    f1.add(cp, 'Train_images');
+    f1.add(cp, 'Predict_future');
     f1.add(cp, 'Show_future');
 
     f2.add(cp, 'server_ip');
@@ -104,7 +104,7 @@ var Controls = function() {
     };
 
     this.Train_video = function(){
-        
+        trainModel();
     };
 
     // ----------- Post training
@@ -129,7 +129,7 @@ var Controls = function() {
         });
     };
 
-    this.Train_images = function(){
+    this.Predict_future = function(){
         // ask server to train data
         trainImages();
     };
@@ -174,13 +174,37 @@ function b64_creation(img_data){
                 print(msg);
                 counter = counter + 1;
                 if(counter >= cp.Image_count){
-                    window.alert("Saved " + cp.Image_count + " images in server");
+                    // window.alert("Saved " + cp.Image_count + " images in server");
+                    
+                    document.getElementById("pictureStatus").innerHTML="SAVED " + cp.Image_count + " IMAGES IN SERVER";
+                    document.getElementById("pictureStatus").style.color = "#DB5F89";
                     counter = 0;
+                    
+                    setTimeout(function() {
+                        document.getElementById("pictureStatus").innerHTML="PREDICT FUTURE";
+                        document.getElementById("pictureStatus").style.color = "#FFCC00";
+                    }, delay);
                 }
             }else{
                 print("didn't get the msg");
-                window.alert("didn't get the msg");
+                // window.alert("didn't get the msg");
+                document.getElementById("pictureStatus").innerHTML="didn't get the msg";
+                document.getElementById("pictureStatus").style.color = "#FC3164";
             }
+        },
+        error: function(data){
+            document.getElementById("pictureStatus").innerHTML="INTERNAL ERROR. Check server";
+            document.getElementById("pictureStatus").style.color = "#FC3164";
+        },
+        statusCode: {
+            500: function() {
+                document.getElementById("pictureStatus").innerHTML="SCRIPT EXHAUSTED. Check server";
+                document.getElementById("pictureStatus").style.color = "#FC3164";
+            },
+            503: function(){
+                document.getElementById("pictureStatus").innerHTML="SERVER UNAVAILABLE. Check server";
+                document.getElementById("pictureStatus").style.color = "#FC3164";
+            },
         }
     });
 }
@@ -202,10 +226,32 @@ function cleanData(){
         data: flag,
         success: function(msg){
             if(msg == "ok cleaned"){
-                window.alert("Cleaned old data in server.\nYou can save new images");
+                // window.alert("Cleaned old data in server.\nYou can save new images");
+                document.getElementById("pictureStatus").innerHTML="DELETED OLD PICTURES";
+                //DELAY
+                setTimeout(function() {
+                    document.getElementById("pictureStatus").innerHTML="TAKE PICTURES";
+                    document.getElementById("pictureStatus").style.color = "#FFCC00";
+                }, delay);
             }else{
-                window.alert("didn't get the msg");
+                // window.alert("didn't get the msg");
+                document.getElementById("pictureStatus").innerHTML="DID BNOT GET THE RESPONSE";
+                document.getElementById("pictureStatus").style.color = "#FFCC00";
             }
+        },
+        error: function(data){
+            document.getElementById("pictureStatus").innerHTML="INTERNAL ERROR. Check server";
+            document.getElementById("pictureStatus").style.color = "#FC3164";
+        },
+        statusCode: {
+            500: function() {
+              document.getElementById("pictureStatus").innerHTML="SCRIPT EXHAUSTED. Check server";
+              document.getElementById("pictureStatus").style.color = "#FC3164";
+            },
+            503: function(){
+                document.getElementById("pictureStatus").innerHTML="SERVER UNAVAILABLE. Check server";
+                document.getElementById("pictureStatus").style.color = "#FC3164";
+            },
         }
     });
 }
@@ -230,8 +276,12 @@ function fetchTrainedImage(){
             if (msgHeader == "ok fetch"){
             //  // pull the image form th client's folder:
                 document.getElementById("futureImg").src="/data/" + clientFolder + "/ClientFuture/future.jpg";
+                document.getElementById("pictureStatus").innerHTML="LIKE IT?";
+                document.getElementById("pictureStatus").style.color = "#FFCC00";
             }else if (msg == "no picture"){
-                window.alert("OOPs! No Future for you");
+                // window.alert("OOPs! No Future for you");
+                document.getElementById("pictureStatus").innerHTML="OOPS! NO FUTURE FOR YOU";
+                document.getElementById("pictureStatus").style.color = "#FC3164";
             }else{
                 window.alert("Not in scope yet");
             }
@@ -244,7 +294,7 @@ const chunks = [];
 function record(delay) {
     // console.log(delay*1000);
     print("recording");
-    document.getElementById("vidStatus").innerHTML="RECORDING VIDEO";
+    document.getElementById("vidStatus").innerHTML="RECORDING VIDEO...";
     document.getElementById("vidStatus").style.color = "#DB5F89";
     chunks.length = 0;
     let stream = document.querySelector('canvas').captureStream(30),
@@ -291,7 +341,7 @@ function exportVideoWithBS64(e) {
                     document.getElementById("vidStatus").style.color = "#2FA1D6";
                     //DELAY 
                     setTimeout(function() {
-                        document.getElementById("vidStatus").innerHTML="RECORD VIDEO";
+                        document.getElementById("vidStatus").innerHTML="TRAIN VIDEO";
                         document.getElementById("vidStatus").style.color = "#FFCC00";
                     }, 5000);
                 }else if (mag == "video conversion error"){
@@ -339,8 +389,26 @@ function deleteOldVideo(delay){
                     document.getElementById("vidStatus").innerHTML="THERE WAS AN ERROR IN DELETION";
                     document.getElementById("vidStatus").style.color = "#FC3164";
                 }
+            },
+            error: function(data){
+            document.getElementById("vidStatus").innerHTML="INTERNAL ERROR. Check server";
+            document.getElementById("vidStatus").style.color = "#FC3164";
+            },
+            statusCode: {
+                500: function() {
+                  document.getElementById("vidStatus").innerHTML="SCRIPT EXHAUSTED. Check server";
+                  document.getElementById("vidStatus").style.color = "#FC3164";
+                },
+                503: function(){
+                    document.getElementById("vidStatus").innerHTML="SERVER UNAVAILABLE. Check server";
+                    document.getElementById("vidStatus").style.color = "#FC3164";
+                },
             }
         });
+}
+
+function trainModel(){
+
 }
 
 
@@ -359,12 +427,42 @@ function openSocket() {
     connected = true;
     socket.send("Hello server");
 }
+
+var switchMode = "LOW";
+var trainingMode = false;
+var testMode = true;
  
 function showData(result) {
     if(connected){
         // when the server returns, show the result:
         var server_dump = JSON.parse(result.data);
         console.log(server_dump);
+
+        switchMode = server_dump.buttonTraining;
+
+        if(switchMode == "LOW"){
+            trainingMode = false;
+            testMode = true;
+            //trainingStatus div invisible
+            document.getElementById("trainingStatus").style.visibility = "hidden";
+            //testStatus div visible
+            document.getElementById("testStatus").style.visibility = "visible";
+
+            f0.close();
+            f1.open();
+            f2.open();
+        }else if (switchMode == "HIGH"){
+            trainingMode = true;
+            testMode = false;
+            //trainingStatus div visible
+            document.getElementById("trainingStatus").style.visibility = "visible";
+            //testStatus div invisible
+            document.getElementById("testStatus").style.visibility = "hidden";
+
+            f0.open();
+            f1.close();
+            f2.open();
+        }
 
         if(server_dump == "Connection confirmed"){
             document.getElementById("notConnected").style.visibility = "hidden";
@@ -373,28 +471,37 @@ function showData(result) {
         }
             
 
-        if(server_dump.buttonOne == "HIGH"){
+        if(testMode && !trainingMode && server_dump.buttonOne == "HIGH"){
             // -- clean data
             console.log("clean data");
             cleanData();
+        }else if (!testMode && trainingMode && server_dump.buttonOne == "HIGH"){
+            console.log("delete old video");
+            deleteOldVideo(5000);
         }
 
-        if(server_dump.buttonTwo == "HIGH"){
+        if(testMode && !trainingMode && server_dump.buttonTwo == "HIGH"){
             // -- take pictures
             console.log("take pictures");
 
             saveFrames("frames", "jpg", cp.Image_count, 1, function(data){
                 save_frames_server(data);
             });
+        }else if (!testMode && trainingMode && server_dump.buttonTwo == "HIGH"){
+            //save video 
+            record(cp.Video_duration);
         }
 
-        if(server_dump.buttonThree == "HIGH"){
+        if(testMode && !trainingMode && server_dump.buttonThree == "HIGH"){
             // -- train model
-            console.log("train model");
+            console.log("generate picture against model");
             trainImages();
+        }else if (!testMode && trainingMode && server_dump.buttonThree == "HIGH"){
+            console.log("Train model");
+            trainModel();
         }
 
-        if(server_dump.buttonFour == "HIGH"){
+        if(testMode && !trainingMode && server_dump.buttonFour == "HIGH"){
             // -- show future
             console.log("show future");
             fetchTrainedImage();

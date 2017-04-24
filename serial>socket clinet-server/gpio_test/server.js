@@ -1,10 +1,12 @@
 var GPIO = require('onoff').Gpio,
+    buttonTraining = new GPIO(4, 'in', 'both');
     buttonOne = new GPIO(17, 'in', 'both');
     buttonTwo = new GPIO(18, 'in', 'both');
     buttonThree = new GPIO(19, 'in', 'both');
     buttonFour = new GPIO(20, 'in', 'both');
 
 var buttonStates = {
+                      buttonTraining: "LOW",
                       buttonOne: "LOW",
                       buttonTwo: "LOW",
                       buttonThree: "LOW",
@@ -79,6 +81,26 @@ function switchFour(err, state) {
   }
 }
 
+function switchState(err, state) {
+  if(err){
+     throw err;
+  }else{
+    if(state == 1) {
+      buttonStates.buttonTraining = "HIGH";
+      broadcast(buttonStates);
+      console.log("Training Mode");
+      // console.log(buttonStates);
+    
+    }else{
+      buttonStates.buttonTraining = "LOW";
+      broadcast(buttonStates);
+      console.log("Test Mode");
+      // console.log(buttonStates);
+    }
+  }
+}
+
+buttonTraining.watch(switchState);
 buttonOne.watch(switchOne);
 buttonTwo.watch(switchTwo);
 buttonThree.watch(switchThree);
@@ -148,6 +170,7 @@ function handleConnection(client){
 
     if (sendData){
       broadcast(msgFromServer);
+      broadcast(buttonStates);
     }
 
   });
