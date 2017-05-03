@@ -436,7 +436,7 @@ function showData(result) {
     if(connected){
         // when the server returns, show the result:
         var server_dump = JSON.parse(result.data);
-        console.log(server_dump);
+        // console.log(server_dump);
 
         switchMode = server_dump.buttonTraining;
 
@@ -471,37 +471,37 @@ function showData(result) {
         }
             
 
-        if(testMode && !trainingMode && server_dump.buttonOne == "HIGH"){
+        if(testMode && !trainingMode && server_dump.buttonThree == "HIGH"){
             // -- clean data
             console.log("clean data");
             cleanData();
-        }else if (!testMode && trainingMode && server_dump.buttonOne == "HIGH"){
+        }else if (!testMode && trainingMode && server_dump.buttonThree == "HIGH"){
             console.log("delete old video");
             deleteOldVideo(5000);
         }
 
-        if(testMode && !trainingMode && server_dump.buttonTwo == "HIGH"){
+        if(testMode && !trainingMode && server_dump.buttonFour == "HIGH"){
             // -- take pictures
             console.log("take pictures");
 
             saveFrames("frames", "jpg", cp.Image_count, 1, function(data){
                 save_frames_server(data);
             });
-        }else if (!testMode && trainingMode && server_dump.buttonTwo == "HIGH"){
+        }else if (!testMode && trainingMode && server_dump.buttonFour == "HIGH"){
             //save video 
             record(cp.Video_duration);
         }
 
-        if(testMode && !trainingMode && server_dump.buttonThree == "HIGH"){
+        if(testMode && !trainingMode && server_dump.buttonTwo == "HIGH"){
             // -- train model
             console.log("generate picture against model");
             trainImages();
-        }else if (!testMode && trainingMode && server_dump.buttonThree == "HIGH"){
+        }else if (!testMode && trainingMode && server_dump.buttonTwo == "HIGH"){
             console.log("Train model");
             trainModel();
         }
 
-        if(testMode && !trainingMode && server_dump.buttonFour == "HIGH"){
+        if(testMode && !trainingMode && server_dump.buttonOne == "HIGH"){
             // -- show future
             console.log("show future");
             fetchTrainedImage();

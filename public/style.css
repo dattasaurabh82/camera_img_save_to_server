@@ -1,3 +1,13 @@
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
+canvas {
+  /*position: fixed;*/
+  vertical-align: top;
+  top: 0;
+  left: 0;
+  Z-index: 1;
+} 
+
+
 body {
     padding: 0;
     margin: 0;
@@ -84,4 +94,3 @@ canvas {
   color:#FFCC00;
 }
 
-/* */
