@@ -99,6 +99,20 @@ And make it executable: <br>
 ### 9. Check: <br>
 `sudo reboot`
 
+# Python part to show server ip on OLED screen
+### Installing dependencies:
+```
+sudo apt-get update
+sudo apt-get install build-essential python-dev python-pip
+sudo pip install RPi.GPIO
+
+sudo apt-get install python-imaging python-smbus
+
+sudo apt-get install git
+git clone https://github.com/adafruit/Adafruit_Python_SSD1306.git
+cd Adafruit_Python_SSD1306
+sudo python setup.py install
+```
 
 # MAKING THE GUI ON BOOTABLE WSS Pi zero SERVER WHICH SHOWS THE SERVER INNFO we can use in our web app to connect this physical controller: <br>
 It is using TKinter for python 2.7 which comes bydefault in raspberry Pi zero <br>
