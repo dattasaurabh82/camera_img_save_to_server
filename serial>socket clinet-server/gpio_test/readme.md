@@ -113,6 +113,18 @@ git clone https://github.com/adafruit/Adafruit_Python_SSD1306.git
 cd Adafruit_Python_SSD1306
 sudo python setup.py install
 ```
+### Test it:
+```
+cd gpio_test
+python info.py
+```
+or
+
+```
+cd gpio_test
+sudo ./launcher.sh
+```
+These should give the ip address on the screen
 
 # MAKING THE GUI ON BOOTABLE WSS Pi zero SERVER WHICH SHOWS THE SERVER INNFO we can use in our web app to connect this physical controller: <br>
 It is using TKinter for python 2.7 which comes bydefault in raspberry Pi zero <br>
