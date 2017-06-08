@@ -1,6 +1,7 @@
 var express = require('express');
 var https = require('https');
 var fs = require('fs');
+// var fs = require('fs-extra'); //for ubuntu server
 var bodyParser = require('body-parser');
 var shell = require('shelljs');
 
@@ -46,6 +47,7 @@ app.post('/vid_sent/', function(req, res){
   // if the main client folder doesn't exist create one
   if (!fs.existsSync(folder_path)){
     fs.mkdirSync(folder_path);
+    // fs.mkdirsSync(folder_path);// for ubuntu server
     console.log("made " + folder_path);
   }else{
       console.log("folder: " + folder_path + " exists");
@@ -53,6 +55,7 @@ app.post('/vid_sent/', function(req, res){
   // if the sub folder doesn't exist create one
   if(!fs.existsSync(training_video_folderPath)){
     fs.mkdirSync(training_video_folderPath);
+    // fs.mkdirsSync(training_video_folderPath);// for ubuntu server
     console.log("made client's future folder " + "\" " + training_video_folderPath + " \"");
   }else{
     console.log("folder: " + training_video_folderPath + " exists");
@@ -136,6 +139,7 @@ app.post('/img_sent/', function(req, res) {
     // if the main image data folder doesn't exist create one
     if (!fs.existsSync(folder_path)){
       fs.mkdirSync(folder_path);
+      // fs.mkdirsSync(folder_path); //for ubuntu server
       console.log("made " + folder_path);
     }else{
       console.log("folder: " + folder_path + " exists");
@@ -145,6 +149,7 @@ app.post('/img_sent/', function(req, res) {
     // if the sub folder doesn't exist create one
     if(!fs.existsSync(client_future_folderPath)){
       fs.mkdirSync(client_future_folderPath);
+      // fs.mkdirsSync(client_future_folderPath); // for ubuntu server
       console.log("made client's future folder " + "\" " + client_future_folderPath + " \"");
     }else{
       console.log("folder: " + client_future_folderPath + " exists");
